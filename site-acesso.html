@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Acesso ao Sistema</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a0f;
+    --surface:   #111118;
+    --card:      #16161f;
+    --border:    #252535;
+    --border2:   #2e2e45;
+    --accent:    #5b6af0;
+    --accent2:   #8b96ff;
+    --success:   #34d399;
+    --warning:   #f59e0b;
+    --text:      #e8e8f0;
+    --muted:     #7070a0;
+    --faint:     #3a3a55;
+    --admin:     #ff6b6b;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── BACKGROUND ─── */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 10%, rgba(91,106,240,.13) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 90%, rgba(139,150,255,.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(52,211,153,.04) 0%, transparent 60%);
+  }
+  .grid-lines {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(91,106,240,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,106,240,.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 30%, transparent 80%);
+  }
+
+  /* ─── ADMIN TRIGGER ─── */
+  #admin-trigger {
+    position: fixed; top: 18px; right: 22px; z-index: 1000;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--faint);
+    cursor: pointer;
+    transition: background .3s, box-shadow .3s, transform .3s;
+    border: none;
+    title: "Admin";
+  }
+  #admin-trigger:hover {
+    background: var(--admin);
+    box-shadow: 0 0 16px rgba(255,107,107,.6);
+    transform: scale(1.4);
+  }
+
+  /* ─── ADMIN MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    animation: fadeIn .2s ease;
+  }
+  .modal-overlay.open { display: flex; }
+  .admin-card {
+    background: var(--card);
+    border: 1px solid rgba(255,107,107,.2);
+    border-radius: 16px;
+    padding: 40px 36px 32px;
+    width: 360px;
+    max-width: 95vw;
+    position: relative;
+    box-shadow: 0 0 60px rgba(255,107,107,.1);
+    animation: slideUp .25s ease;
+  }
+  .admin-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--admin);
+    background: rgba(255,107,107,.08);
+    border: 1px solid rgba(255,107,107,.2);
+    padding: 4px 10px; border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .admin-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--admin); }
+  .modal-close {
+    position: absolute; top:14px; right:16px;
+    background: none; border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer; line-height:1;
+    transition: color .2s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  /* ─── WRAPPER ─── */
+  .wrapper {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 20px;
+  }
+
+  /* ─── LOGO / HEADER ─── */
+  .logo-area {
+    text-align: center; margin-bottom: 36px;
+    animation: fadeDown .5s ease both;
+  }
+  .logo-mark {
+    width: 52px; height: 52px;
+    margin: 0 auto 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(91,106,240,.35);
+  }
+  .logo-area h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -.02em;
+    background: linear-gradient(135deg, var(--text) 40%, var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo-area p {
+    color: var(--muted); font-size: 13px; margin-top: 4px;
+  }
+
+  /* ─── MAIN CARD ─── */
+  .main-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 100%; max-width: 480px;
+    padding: 36px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.5);
+    animation: fadeUp .5s .1s ease both;
+  }
+
+  /* ─── TAB NAV ─── */
+  .tab-nav {
+    display: flex; gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 5px;
+    margin-bottom: 28px;
+  }
+  .tab-btn {
+    flex: 1; padding: 9px 0;
+    background: none; border: none; border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--muted); cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(91,106,240,.35);
+  }
+
+  /* ─── SECTION NAV (Login / Cadastro) ─── */
+  .section-nav {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 26px;
+  }
+  .sec-btn {
+    flex: 1; padding: 10px 0;
+    background: none; border: none; border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    color: var(--muted); cursor: pointer;
+    transition: color .2s, border-color .2s;
+  }
+  .sec-btn.active {
+    color: var(--accent2);
+    border-bottom-color: var(--accent2);
+  }
+
+  /* ─── FORM PANELS ─── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ─── FORM FIELDS ─── */
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 7px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 12px 15px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(91,106,240,.15);
+  }
+  .field input::placeholder { color: var(--faint); }
+  .field select { cursor: pointer; }
+  .field select option { background: var(--surface); }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 22px 0; color: var(--faint); font-size: 12px;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn-primary {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--accent), #7b8bff);
+    border: none; border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: .06em;
+    color: #fff; cursor: pointer;
+    transition: transform .15s, box-shadow .2s, opacity .2s;
+    box-shadow: 0 6px 24px rgba(91,106,240,.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(91,106,240,.45); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-admin {
+    background: linear-gradient(135deg, var(--admin), #ff9a9a);
+    box-shadow: 0 6px 24px rgba(255,107,107,.3);
+  }
+  .btn-admin:hover { box-shadow: 0 10px 32px rgba(255,107,107,.4); }
+
+  /* ─── HELPER TEXTS ─── */
+  .helper { font-size: 12px; color: var(--muted); margin-top: 18px; text-align: center; }
+  .helper a { color: var(--accent2); text-decoration: none; cursor: pointer; }
+  .helper a:hover { text-decoration: underline; }
+
+  .forgot { display: block; text-align: right; font-size: 12px; color: var(--muted); margin-top: -10px; margin-bottom: 18px; cursor: pointer; }
+  .forgot:hover { color: var(--accent2); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 40px; padding: 12px 24px;
+    font-size: 13px; color: var(--text);
+    box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    transition: transform .35s cubic-bezier(.22,.68,0,1.2);
+    z-index: 9999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.ok { border-color: var(--success); color: var(--success); }
+  .toast.err { border-color: var(--admin); color: var(--admin); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+  @keyframes fadeUp  { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:none } }
+  @keyframes fadeDown{ from { opacity:0; transform:translateY(-14px) } to { opacity:1; transform:none } }
+  @keyframes slideUp { from { opacity:0; transform:translateY(30px) } to { opacity:1; transform:none } }
+
+  /* ─── SEPARATOR CHIP ─── */
+  .type-chip {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing:.1em; text-transform:uppercase;
+    margin-bottom: 6px;
+  }
+  .chip-pf { background:rgba(91,106,240,.12); color:var(--accent2); border:1px solid rgba(91,106,240,.2); }
+  .chip-pj { background:rgba(52,211,153,.1); color:var(--success); border:1px solid rgba(52,211,153,.2); }
+  .chip-admin { background:rgba(255,107,107,.1); color:var(--admin); border:1px solid rgba(255,107,107,.2); }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-lines"></div>
+
+<!-- ADMIN TRIGGER (pontinho discreto canto superior direito) -->
+<button id="admin-trigger" title="Área restrita" onclick="openAdmin()"></button>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="admin-card">
+    <button class="modal-close" onclick="closeAdmin()">×</button>
+    <div class="admin-badge">Acesso Restrito</div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">Painel Admin</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:24px;">Somente para administradores autorizados.</p>
+
+    <div class="field">
+      <label>E-mail corporativo</label>
+      <input type="email" id="admin-email" placeholder="admin@empresa.com" />
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="admin-pass" placeholder="••••••••" />
+    </div>
+    <button class="btn-primary btn-admin" onclick="handleAdmin()">Entrar como Admin</button>
+  </div>
+</div>
+
+<!-- MAIN WRAPPER -->
+<div class="wrapper">
+
+  <div class="logo-area">
+    <div class="logo-mark">S</div>
+    <h1>ConectaMarket</h1>
+    <p>Seja Bem-Vindo</p>
+  </div>
+
+  <div class="main-card">
+
+    <!-- Tipo de pessoa -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tab-pf" onclick="switchType('pf')">Pessoa Física</button>
+      <button class="tab-btn" id="tab-pj" onclick="switchType('pj')">Pessoa Jurídica</button>
+    </div>
+
+    <!-- Login / Cadastro -->
+    <div class="section-nav">
+      <button class="sec-btn active" id="sec-login" onclick="switchSection('login')">Login</button>
+      <button class="sec-btn" id="sec-cad" onclick="switchSection('cadastro')">Cadastro</button>
+    </div>
+
+    <!-- ════════════════════ PF LOGIN ════════════════════ -->
+    <div class="panel active" id="panel-pf-login">
+      <div style="margin-bottom:18px"><span class="type-chip chip-pf">PF</span></div>
+      <div class="field">
+        <label>CPF</label>
+        <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf')" />
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" placeholder="••••••••" />
+      </div>
+      <span class="forgot" onclick="toast('Link de recuperação enviado!','ok')">Esqueci minha senha</span>
+      <button class="btn-primary" onclick="toast('Login realizado com sucesso! ✓','ok')">Entrar</button>
+      <div class="helper">Não tem conta? <a onclick="switchSection('cadastro')">Cadastre-se</a></div>
+    </div>
+
+    <!-- ════════════════════ PF CADASTRO ════════════════════ -->
+    <div class="panel" id="panel-pf-cadastro">
+      <div style="margin-bottom:18px"><span class="type-chip chip-pf">PF — Novo Cadastro</span></div>
+      <div class="row2">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" placeholder="João" />
+        </div>
+        <div class="field">
+          <label>Sobrenome</label>
+          <input type="text" placeholder="Silva" />
+        </div>
+      </div>
+      <div class="field">
+        <label>CPF</label>
+        <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf')" />
+      </div>
+      <div class="field">
+        <label>Data de Nascimento</label>
+        <input type="date" />
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="mask(this,'tel')" />
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" placeholder="joao@email.com" />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+        <div class="field">
+          <label>Confirmar</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+      </div>
+      <button class="btn-primary" onclick="toast('Cadastro PF realizado! ✓','ok')">Criar Conta</button>
+      <div class="helper">Já tem conta? <a onclick="switchSection('login')">Faça login</a></div>
+    </div>
+
+    <!-- ════════════════════ PJ LOGIN ════════════════════ -->
+    <div class="panel" id="panel-pj-login">
+      <div style="margin-bottom:18px"><span class="type-chip chip-pj">PJ</span></div>
+      <div class="field">
+        <label>CNPJ</label>
+        <input type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="mask(this,'cnpj')" />
+      </div>
+      <div class="field">
+        <label>E-mail corporativo</label>
+        <input type="email" placeholder="contato@empresa.com.br" />
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" placeholder="••••••••" />
+      </div>
+      <span class="forgot" onclick="toast('Link de recuperação enviado!','ok')">Esqueci minha senha</span>
+      <button class="btn-primary" onclick="toast('Login PJ realizado com sucesso! ✓','ok')">Entrar</button>
+      <div class="helper">Não tem conta? <a onclick="switchSection('cadastro')">Cadastre sua empresa</a></div>
+    </div>
+
+    <!-- ════════════════════ PJ CADASTRO ════════════════════ -->
+    <div class="panel" id="panel-pj-cadastro">
+      <div style="margin-bottom:18px"><span class="type-chip chip-pj">PJ — Nova Empresa</span></div>
+      <div class="field">
+        <label>Razão Social</label>
+        <input type="text" placeholder="Empresa Exemplo S.A." />
+      </div>
+      <div class="field">
+        <label>Nome Fantasia</label>
+        <input type="text" placeholder="Nome Fantasia (opcional)" />
+      </div>
+      <div class="field">
+        <label>CNPJ</label>
+        <input type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="mask(this,'cnpj')" />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Inscrição Estadual</label>
+          <input type="text" placeholder="Opcional" />
+        </div>
+        <div class="field">
+          <label>Porte</label>
+          <select>
+            <option value="">Selecione</option>
+            <option>MEI</option>
+            <option>ME</option>
+            <option>EPP</option>
+            <option>Médio</option>
+            <option>Grande</option>
+          </select>
+        </div>
+      </div>
+      <div class="divider">Responsável Legal</div>
+      <div class="row2">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" placeholder="Nome" />
+        </div>
+        <div class="field">
+          <label>CPF</label>
+          <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf')" />
+        </div>
+      </div>
+      <div class="field">
+        <label>E-mail corporativo</label>
+        <input type="email" placeholder="contato@empresa.com.br" />
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="mask(this,'tel')" />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+        <div class="field">
+          <label>Confirmar</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+      </div>
+      <button class="btn-primary" onclick="toast('Empresa cadastrada com sucesso! ✓','ok')">Cadastrar Empresa</button>
+      <div class="helper">Já tem conta? <a onclick="switchSection('login')">Faça login</a></div>
+    </div>
+
+  </div><!-- /.main-card -->
+</div><!-- /.wrapper -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let currentType = 'pf';
+  let currentSection = 'login';
+
+  function switchType(type) {
+    currentType = type;
+    document.getElementById('tab-pf').classList.toggle('active', type==='pf');
+    document.getElementById('tab-pj').classList.toggle('active', type==='pj');
+    showPanel();
+  }
+
+  function switchSection(sec) {
+    currentSection = sec;
+    document.getElementById('sec-login').classList.toggle('active', sec==='login');
+    document.getElementById('sec-cad').classList.toggle('active', sec==='cadastro');
+    showPanel();
+  }
+
+  function showPanel() {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    const id = `panel-${currentType}-${currentSection}`;
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  }
+
+  function openAdmin()  { document.getElementById('admin-modal').classList.add('open'); }
+  function closeAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+
+  function handleAdmin() {
+    const e = document.getElementById('admin-email').value;
+    const p = document.getElementById('admin-pass').value;
+    if (!e || !p) { toast('Preencha todos os campos','err'); return; }
+    closeAdmin();
+    toast('Acesso admin autorizado ✓','ok');
+  }
+
+  // Fechar modal ao clicar fora
+  document.getElementById('admin-modal').addEventListener('click', function(ev){
+    if (ev.target === this) closeAdmin();
+  });
+
+  // ── MASKS ──
+  function mask(input, type) {
+    let v = input.value.replace(/\D/g,'');
+    if (type==='cpf') {
+      v = v.slice(0,11);
+      v = v.replace(/(\d{3})(\d)/,'$1.$2')
+           .replace(/(\d{3})(\d)/,'$1.$2')
+           .replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    } else if (type==='cnpj') {
+      v = v.slice(0,14);
+      v = v.replace(/(\d{2})(\d)/,'$1.$2')
+           .replace(/(\d{3})(\d)/,'$1.$2')
+           .replace(/(\d{3})(\d)/,'$1/$2')
+           .replace(/(\d{4})(\d{1,2})$/,'$1-$2');
+    } else if (type==='tel') {
+      v = v.slice(0,11);
+      v = v.length<=10
+        ? v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3')
+        : v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+    }
+    input.value = v;
+  }
+
+  // ── TOAST ──
+  let toastTimer;
+  function toast(msg, type='') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast ' + type;
+    clearTimeout(toastTimer);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => el.classList.add('show'));
+    });
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

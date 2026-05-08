@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Empresa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #070818;
+    --surface: #11131f;
+    --border: #252f4a;
+    --accent: #67d4ff;
+    --text: #e6e8ff;
+    --muted: #8d94b1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: radial-gradient(circle at top right, rgba(103,212,255,.16), transparent 26%), var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+  .page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; background: rgba(17,19,31,.9); border: 1px solid rgba(255,255,255,.05); border-radius: 18px; backdrop-filter: blur(12px); }
+  .logo { font-family:'Syne',sans-serif; font-size: 20px; font-weight: 800; letter-spacing: .08em; }
+  .nav-links { display: flex; gap: 12px; flex-wrap: wrap; }
+  .nav-links a { padding: 10px 16px; border-radius: 12px; text-decoration: none; color: var(--muted); font-size: 13px; background: rgba(255,255,255,.03); }
+  .nav-links a.active { color: #fff; background: rgba(103,212,255,.16); }
+  .header-actions { display: flex; gap: 12px; align-items: center; position: relative; }
+  .profile-menu { position: relative; }
+  .profile-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); color: var(--text); font-weight: 700; cursor: pointer; }
+  .profile-menu-list { position: absolute; right: 0; top: calc(100% + 10px); width: 196px; padding: 10px 0; background: rgba(17,19,31,.98); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,.35); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: opacity .18s ease, transform .18s ease, visibility .18s ease; z-index: 10; }
+  .profile-menu.open .profile-menu-list { opacity: 1; visibility: visible; transform: translateY(0); }
+  .profile-menu-link { display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--text); text-decoration: none; font-size: 14px; }
+  .profile-menu-link:hover { background: rgba(255,255,255,.05); }
+  .profile-menu-title { display: block; width: 100%; padding: 12px 16px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+  .btn-secondary { padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); color: var(--text); text-decoration: none; }
+  .search-row { margin-top: 24px; display: flex; justify-content: center; }
+  .search-row input { width: 100%; max-width: 760px; padding: 16px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.04); color: var(--text); font-size: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+  .card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); border-radius: 22px; padding: 20px; min-height: 240px; display: flex; flex-direction: column; justify-content: space-between; }
+  .card-title { font-family:'Syne',sans-serif; font-size: 16px; margin-bottom: 12px; }
+  .card-content { flex: 1; color: var(--muted); font-size: 14px; line-height: 1.8; }
+  .card-action { margin-top: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: #fff; background: linear-gradient(135deg, var(--accent), #6a9cff); }
+  @media(max-width: 940px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media(max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="logo">Empresa</div>
+      <div class="nav-links">
+        <a class="active" href="#">Candidatos</a>
+        <a href="#">Currículos</a>
+        <a href="#">Competências</a>
+      </div>
+      <div class="header-actions">
+        <div class="profile-menu" id="profileMenu">
+          <button class="profile-btn" onclick="toggleProfileMenu(event)">EM</button>
+          <div class="profile-menu-list">
+            <span class="profile-menu-title">Conta</span>
+            <a class="profile-menu-link" href="#">Perfil</a>
+            <a class="profile-menu-link" href="#">Configurações</a>
+            <a class="profile-menu-link" href="testeSite.html">Sair</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="search-row">
+      <input type="text" placeholder="Buscar candidatos ou habilidades..." disabled />
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div>
+          <div class="card-title">Currículo 1</div>
+          <div class="card-content">Resumo do candidato e principais competências em destaque.</div>
+        </div>
+        <a class="card-action" href="#">Visualizar</a>
+      </div>
+      <div class="card">
+        <div>
+          <div class="card-title">Currículo 2</div>
+          <div class="card-content">Resumo do candidato e principais competências em destaque.</div>
+        </div>
+        <a class="card-action" href="#">Visualizar</a>
+      </div>
+      <div class="card">
+        <div>
+          <div class="card-title">Currículo 3</div>
+          <div class="card-content">Resumo do candidato e principais competências em destaque.</div>
+        </div>
+        <a class="card-action" href="#">Visualizar</a>
+      </div>
+      <div class="card">
+        <div>
+          <div class="card-title">Currículo 4</div>
+          <div class="card-content">Resumo do candidato e principais competências em destaque.</div>
+        </div>
+        <a class="card-action" href="#">Visualizar</a>
+      </div>
+      <div class="card">
+        <div>
+          <div class="card-title">Currículo 5</div>
+          <div class="card-content">Resumo do candidato e principais competências em destaque.</div>
+        </div>
+        <a class="card-action" href="#">Visualizar</a>
+      </div>
+      <div class="card">
+        <div>
+          <div class="card-title">Currículo 6</div>
+          <div class="card-content">Resumo do candidato e principais competências em destaque.</div>
+        </div>
+        <a class="card-action" href="#">Visualizar</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleProfileMenu(event) {
+      event.stopPropagation();
+      const menu = document.getElementById('profileMenu');
+      menu.classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('profileMenu');
+      if (!menu) return;
+      if (!event.target.closest('.profile-menu')) {
+        menu.classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>

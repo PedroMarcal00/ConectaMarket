@@ -7,578 +7,357 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg:        #0a0a0f;
-    --surface:   #111118;
-    --card:      #16161f;
-    --border:    #252535;
-    --border2:   #2e2e45;
-    --accent:    #5b6af0;
-    --accent2:   #8b96ff;
-    --success:   #34d399;
-    --warning:   #f59e0b;
-    --text:      #e8e8f0;
-    --muted:     #7070a0;
-    --faint:     #3a3a55;
-    --admin:     #ff6b6b;
+    --bg:#0a0a0f;--surface:#111118;--card:#16161f;--border:#252535;--border2:#2e2e45;
+    --accent:#5b6af0;--accent2:#8b96ff;--success:#34d399;--error:#ff6b6b;
+    --text:#e8e8f0;--muted:#7070a0;--faint:#3a3a55;--admin:#ff6b6b;
   }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
-
-  /* ─── BACKGROUND ─── */
-  .bg-layer {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 80% 60% at 15% 10%, rgba(91,106,240,.13) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 85% 90%, rgba(139,150,255,.08) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(52,211,153,.04) 0%, transparent 60%);
-  }
-  .grid-lines {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(91,106,240,.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(91,106,240,.04) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 30%, transparent 80%);
-  }
-
-  /* ─── ADMIN TRIGGER ─── */
-  #admin-trigger {
-    position: fixed; top: 18px; right: 22px; z-index: 1000;
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--faint);
-    cursor: pointer;
-    transition: background .3s, box-shadow .3s, transform .3s;
-    border: none;
-    title: "Admin";
-  }
-  #admin-trigger:hover {
-    background: var(--admin);
-    box-shadow: 0 0 16px rgba(255,107,107,.6);
-    transform: scale(1.4);
-  }
-
-  /* ─── ADMIN MODAL ─── */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 999;
-    background: rgba(0,0,0,.7);
-    backdrop-filter: blur(6px);
-    align-items: center; justify-content: center;
-    animation: fadeIn .2s ease;
-  }
-  .modal-overlay.open { display: flex; }
-  .admin-card {
-    background: var(--card);
-    border: 1px solid rgba(255,107,107,.2);
-    border-radius: 16px;
-    padding: 40px 36px 32px;
-    width: 360px;
-    max-width: 95vw;
-    position: relative;
-    box-shadow: 0 0 60px rgba(255,107,107,.1);
-    animation: slideUp .25s ease;
-  }
-  .admin-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: .12em; text-transform: uppercase;
-    color: var(--admin);
-    background: rgba(255,107,107,.08);
-    border: 1px solid rgba(255,107,107,.2);
-    padding: 4px 10px; border-radius: 20px;
-    margin-bottom: 20px;
-  }
-  .admin-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--admin); }
-  .modal-close {
-    position: absolute; top:14px; right:16px;
-    background: none; border: none; color: var(--muted);
-    font-size: 20px; cursor: pointer; line-height:1;
-    transition: color .2s;
-  }
-  .modal-close:hover { color: var(--text); }
-
-  /* ─── WRAPPER ─── */
-  .wrapper {
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 60px 20px;
-  }
-
-  /* ─── LOGO / HEADER ─── */
-  .logo-area {
-    text-align: center; margin-bottom: 36px;
-    animation: fadeDown .5s ease both;
-  }
-  .logo-mark {
-    width: 52px; height: 52px;
-    margin: 0 auto 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 800;
-    color: #fff;
-    box-shadow: 0 8px 30px rgba(91,106,240,.35);
-  }
-  .logo-area h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px; font-weight: 800;
-    letter-spacing: -.02em;
-    background: linear-gradient(135deg, var(--text) 40%, var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .logo-area p {
-    color: var(--muted); font-size: 13px; margin-top: 4px;
-  }
-
-  /* ─── MAIN CARD ─── */
-  .main-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    width: 100%; max-width: 480px;
-    padding: 36px;
-    box-shadow: 0 24px 80px rgba(0,0,0,.5);
-    animation: fadeUp .5s .1s ease both;
-  }
-
-  /* ─── TAB NAV ─── */
-  .tab-nav {
-    display: flex; gap: 6px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 5px;
-    margin-bottom: 28px;
-  }
-  .tab-btn {
-    flex: 1; padding: 9px 0;
-    background: none; border: none; border-radius: 8px;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    letter-spacing: .04em;
-    color: var(--muted); cursor: pointer;
-    transition: background .2s, color .2s;
-  }
-  .tab-btn.active {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(91,106,240,.35);
-  }
-
-  /* ─── SECTION NAV (Login / Cadastro) ─── */
-  .section-nav {
-    display: flex; gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 26px;
-  }
-  .sec-btn {
-    flex: 1; padding: 10px 0;
-    background: none; border: none; border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 500;
-    color: var(--muted); cursor: pointer;
-    transition: color .2s, border-color .2s;
-  }
-  .sec-btn.active {
-    color: var(--accent2);
-    border-bottom-color: var(--accent2);
-  }
-
-  /* ─── FORM PANELS ─── */
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* ─── FORM FIELDS ─── */
-  .field { margin-bottom: 18px; }
-  .field label {
-    display: block;
-    font-size: 12px; font-weight: 500;
-    letter-spacing: .06em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 7px;
-  }
-  .field input, .field select {
-    width: 100%; padding: 12px 15px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    appearance: none;
-  }
-  .field input:focus, .field select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(91,106,240,.15);
-  }
-  .field input::placeholder { color: var(--faint); }
-  .field select { cursor: pointer; }
-  .field select option { background: var(--surface); }
-
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-  /* ─── DIVIDER ─── */
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 22px 0; color: var(--faint); font-size: 12px;
-  }
-  .divider::before, .divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-
-  /* ─── BUTTONS ─── */
-  .btn-primary {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, var(--accent), #7b8bff);
-    border: none; border-radius: 10px;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px; font-weight: 700;
-    letter-spacing: .06em;
-    color: #fff; cursor: pointer;
-    transition: transform .15s, box-shadow .2s, opacity .2s;
-    box-shadow: 0 6px 24px rgba(91,106,240,.35);
-  }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(91,106,240,.45); }
-  .btn-primary:active { transform: translateY(0); }
-
-  .btn-admin {
-    background: linear-gradient(135deg, var(--admin), #ff9a9a);
-    box-shadow: 0 6px 24px rgba(255,107,107,.3);
-  }
-  .btn-admin:hover { box-shadow: 0 10px 32px rgba(255,107,107,.4); }
-
-  /* ─── HELPER TEXTS ─── */
-  .helper { font-size: 12px; color: var(--muted); margin-top: 18px; text-align: center; }
-  .helper a { color: var(--accent2); text-decoration: none; cursor: pointer; }
-  .helper a:hover { text-decoration: underline; }
-
-  .forgot { display: block; text-align: right; font-size: 12px; color: var(--muted); margin-top: -10px; margin-bottom: 18px; cursor: pointer; }
-  .forgot:hover { color: var(--accent2); }
-
-  /* ─── TOAST ─── */
-  .toast {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: var(--card); border: 1px solid var(--border2);
-    border-radius: 40px; padding: 12px 24px;
-    font-size: 13px; color: var(--text);
-    box-shadow: 0 16px 40px rgba(0,0,0,.5);
-    transition: transform .35s cubic-bezier(.22,.68,0,1.2);
-    z-index: 9999; white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.ok { border-color: var(--success); color: var(--success); }
-  .toast.err { border-color: var(--admin); color: var(--admin); }
-
-  /* ─── ANIMATIONS ─── */
-  @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
-  @keyframes fadeUp  { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:none } }
-  @keyframes fadeDown{ from { opacity:0; transform:translateY(-14px) } to { opacity:1; transform:none } }
-  @keyframes slideUp { from { opacity:0; transform:translateY(30px) } to { opacity:1; transform:none } }
-
-  /* ─── SEPARATOR CHIP ─── */
-  .type-chip {
-    display: inline-block; padding: 2px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 700; letter-spacing:.1em; text-transform:uppercase;
-    margin-bottom: 6px;
-  }
-  .chip-pf { background:rgba(91,106,240,.12); color:var(--accent2); border:1px solid rgba(91,106,240,.2); }
-  .chip-pj { background:rgba(52,211,153,.1); color:var(--success); border:1px solid rgba(52,211,153,.2); }
-  .chip-admin { background:rgba(255,107,107,.1); color:var(--admin); border:1px solid rgba(255,107,107,.2); }
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+  .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 15% 10%,rgba(91,106,240,.13) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 90%,rgba(139,150,255,.08) 0%,transparent 55%),radial-gradient(ellipse 40% 40% at 50% 50%,rgba(52,211,153,.04) 0%,transparent 60%);}
+  .grid-lines{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(91,106,240,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(91,106,240,.04) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,black 30%,transparent 80%);}
+  #admin-trigger{position:fixed;top:18px;right:22px;z-index:1000;width:10px;height:10px;border-radius:50%;background:var(--faint);cursor:pointer;transition:background .3s,box-shadow .3s,transform .3s;border:none;}
+  #admin-trigger:hover{background:var(--admin);box-shadow:0 0 16px rgba(255,107,107,.6);transform:scale(1.4);}
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .admin-card{background:var(--card);border:1px solid rgba(255,107,107,.2);border-radius:16px;padding:40px 36px 32px;width:360px;max-width:95vw;position:relative;box-shadow:0 0 60px rgba(255,107,107,.1);animation:slideUp .25s ease;}
+  .admin-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--admin);background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);padding:4px 10px;border-radius:20px;margin-bottom:20px;}
+  .admin-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--admin);}
+  .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;transition:color .2s;}
+  .modal-close:hover{color:var(--text);}
+  .wrapper{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;}
+  .logo-area{text-align:center;margin-bottom:36px;animation:fadeDown .5s ease both;}
+  .main-card{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:480px;padding:36px;box-shadow:0 24px 80px rgba(0,0,0,.5);animation:fadeUp .5s .1s ease both;}
+  .tab-nav{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:28px;}
+  .tab-btn{flex:1;padding:9px 0;background:none;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--muted);cursor:pointer;transition:background .2s,color .2s;}
+  .tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(91,106,240,.35);}
+  .section-nav{display:flex;border-bottom:1px solid var(--border);margin-bottom:26px;}
+  .sec-btn{flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:color .2s,border-color .2s;}
+  .sec-btn.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+  .panel{display:none;}.panel.active{display:block;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;transition:color .2s;}
+  .field input,.field select{width:100%;padding:12px 15px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;appearance:none;}
+  .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,106,240,.15);}
+  .field input::placeholder{color:var(--faint);}
+  .field select{cursor:pointer;}.field select option{background:var(--surface);}
+  .field.err label{color:var(--error);}
+  .field.err input,.field.err select{border-color:var(--error)!important;box-shadow:0 0 0 3px rgba(255,107,107,.15)!important;background:rgba(255,107,107,.05)!important;}
+  .err-msg{display:none;font-size:11px;color:var(--error);margin-top:5px;padding-left:2px;}
+  .field.err .err-msg{display:block;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--faint);font-size:12px;}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+  .btn-primary{width:100%;padding:14px;margin-top:6px;background:linear-gradient(135deg,var(--accent),#7b8bff);border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;cursor:pointer;transition:transform .15s,box-shadow .2s;box-shadow:0 6px 24px rgba(91,106,240,.35);}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(91,106,240,.45);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-admin{background:linear-gradient(135deg,var(--admin),#ff9a9a);box-shadow:0 6px 24px rgba(255,107,107,.3);}
+  .btn-admin:hover{box-shadow:0 10px 32px rgba(255,107,107,.4);}
+  .helper{font-size:12px;color:var(--muted);margin-top:18px;text-align:center;}
+  .helper a{color:var(--accent2);text-decoration:none;cursor:pointer;}
+  .helper a:hover{text-decoration:underline;}
+  .forgot{display:block;text-align:right;font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:18px;cursor:pointer;}
+  .forgot:hover{color:var(--accent2);}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);border-radius:40px;padding:13px 28px;font-size:14px;font-weight:600;box-shadow:0 16px 40px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.22,.68,0,1.2),opacity .35s;z-index:99999;white-space:nowrap;opacity:0;}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  .toast.ok{background:linear-gradient(135deg,#34d399,#059669);color:#fff;}
+  .toast.err{background:linear-gradient(135deg,#ff6b6b,#dc2626);color:#fff;}
+  .toast.info{background:var(--card);border:1px solid var(--border2);color:var(--text);}
+  .type-chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+  .chip-pf{background:rgba(91,106,240,.12);color:var(--accent2);border:1px solid rgba(91,106,240,.2);}
+  .chip-pj{background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2);}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .shake{animation:shake .35s ease;}
+  .pwd-wrapper{position:relative;}.pwd-wrapper input{padding-right:42px;}
+  .pwd-toggle{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0;line-height:1;transition:color .2s;}
+  .pwd-toggle:hover{color:var(--accent2);}
+  .pwd-strength{margin-top:7px;display:none;}.pwd-strength.visible{display:block;}
+  .strength-bars{display:flex;gap:4px;margin-bottom:5px;}
+  .strength-bar{flex:1;height:3px;border-radius:3px;background:var(--border);transition:background .3s;}
+  .strength-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:color .3s;color:var(--muted);}
+  .pwd-strength.fraco .strength-bar:nth-child(1){background:#ff6b6b;}.pwd-strength.fraco .strength-label{color:#ff6b6b;}
+  .pwd-strength.medio .strength-bar:nth-child(1),.pwd-strength.medio .strength-bar:nth-child(2){background:#f59e0b;}.pwd-strength.medio .strength-label{color:#f59e0b;}
+  .pwd-strength.forte .strength-bar{background:var(--success);}.pwd-strength.forte .strength-label{color:var(--success);}
 </style>
 </head>
 <body>
-
 <div class="bg-layer"></div>
 <div class="grid-lines"></div>
-
-<!-- ADMIN TRIGGER (pontinho discreto canto superior direito) -->
-<button id="admin-trigger" title="Área restrita" onclick="openAdmin()"></button>
-
-<!-- ADMIN MODAL -->
+<button id="admin-trigger" onclick="openAdmin()"></button>
 <div class="modal-overlay" id="admin-modal">
-  <div class="admin-card">
+  <div class="admin-card" id="admin-card">
     <button class="modal-close" onclick="closeAdmin()">×</button>
     <div class="admin-badge">Acesso Restrito</div>
     <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">Painel Admin</h2>
     <p style="color:var(--muted);font-size:13px;margin-bottom:24px;">Somente para administradores autorizados.</p>
-
-    <div class="field">
+    <div class="field" id="fa-email">
       <label>E-mail corporativo</label>
-      <input type="email" id="admin-email" placeholder="admin@empresa.com" />
+      <input type="email" id="admin-email" placeholder="admin@empresa.com" oninput="ce('fa-email')" />
+      <span class="err-msg">Informe o e-mail de administrador</span>
     </div>
-    <div class="field">
+    <div class="field" id="fa-pass">
       <label>Senha</label>
-      <input type="password" id="admin-pass" placeholder="••••••••" />
+      <input type="password" id="admin-pass" placeholder="••••••••" oninput="ce('fa-pass')" />
+      <span class="err-msg">Informe a senha</span>
     </div>
     <button class="btn-primary btn-admin" onclick="handleAdmin()">Entrar como Admin</button>
   </div>
 </div>
-
-<!-- MAIN WRAPPER -->
 <div class="wrapper">
-
   <div class="logo-area">
-    <div class="logo-mark">S</div>
-    <h1>ConectaMarket</h1>
-    <p>Seja Bem-Vindo</p>
+    <svg width="460" height="270" viewBox="0 0 680 360" role="img" style="display:block;margin:0 auto 8px;">
+      <title>ConectaMarket</title>
+      <defs>
+        <linearGradient id="gc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3a6ff7"/><stop offset="100%" style="stop-color:#0a1a6e"/></linearGradient>
+        <linearGradient id="gb" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#3a6ff7"/><stop offset="100%" style="stop-color:#8b96ff"/></linearGradient>
+      </defs>
+      <line x1="238" y1="118" x2="285" y2="118" stroke="#3a6ff7" stroke-width="4" stroke-linecap="round"/>
+      <line x1="228" y1="148" x2="285" y2="148" stroke="#3a6ff7" stroke-width="4" stroke-linecap="round"/>
+      <line x1="238" y1="178" x2="285" y2="178" stroke="#3a6ff7" stroke-width="4" stroke-linecap="round"/>
+      <line x1="285" y1="118" x2="285" y2="178" stroke="#3a6ff7" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="238" cy="118" r="9" fill="none" stroke="#3a6ff7" stroke-width="4"/>
+      <circle cx="228" cy="148" r="9" fill="none" stroke="#3a6ff7" stroke-width="4"/>
+      <circle cx="238" cy="178" r="9" fill="none" stroke="#3a6ff7" stroke-width="4"/>
+      <path d="M380,82 Q310,72 288,118 Q272,148 288,178 Q310,224 380,214" fill="none" stroke="url(#gc)" stroke-width="36" stroke-linecap="round"/>
+      <line x1="340" y1="126" x2="418" y2="126" stroke="#0a1a6e" stroke-width="10" stroke-linecap="round"/>
+      <line x1="336" y1="148" x2="414" y2="148" stroke="#0a1a6e" stroke-width="10" stroke-linecap="round"/>
+      <line x1="332" y1="170" x2="408" y2="170" stroke="#0a1a6e" stroke-width="10" stroke-linecap="round"/>
+      <path d="M418,126 Q432,126 435,136 L435,140" fill="none" stroke="#0a1a6e" stroke-width="10" stroke-linecap="round"/>
+      <path d="M332,170 Q328,185 335,192 L400,192" fill="none" stroke="#0a1a6e" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="352" cy="208" r="10" fill="#0a1a6e"/>
+      <circle cx="390" cy="208" r="10" fill="#0a1a6e"/>
+      <text x="340" y="268" text-anchor="middle" font-family="Georgia, serif" font-size="36" font-weight="400" letter-spacing="2" fill="url(#gb)">ConectaMarket</text>
+      <line x1="220" y1="282" x2="460" y2="282" stroke="url(#gb)" stroke-width="0.8" opacity="0.35"/>
+      <text x="340" y="303" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" letter-spacing="4" fill="#3a6ff7" opacity="0.65">BANCO DE TALENTOS</text>
+    </svg>
   </div>
-
   <div class="main-card">
-
-    <!-- Tipo de pessoa -->
     <div class="tab-nav">
       <button class="tab-btn active" id="tab-pf" onclick="switchType('pf')">Pessoa Física</button>
       <button class="tab-btn" id="tab-pj" onclick="switchType('pj')">Pessoa Jurídica</button>
     </div>
-
-    <!-- Login / Cadastro -->
     <div class="section-nav">
       <button class="sec-btn active" id="sec-login" onclick="switchSection('login')">Login</button>
       <button class="sec-btn" id="sec-cad" onclick="switchSection('cadastro')">Cadastro</button>
     </div>
-
-    <!-- ════════════════════ PF LOGIN ════════════════════ -->
+    <!-- PF LOGIN -->
     <div class="panel active" id="panel-pf-login">
       <div style="margin-bottom:18px"><span class="type-chip chip-pf">PF</span></div>
-      <div class="field">
+      <div class="field" id="pfl-cpf">
         <label>CPF</label>
-        <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf')" />
+        <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf');ce('pfl-cpf')" />
+        <span class="err-msg">CPF inválido — verifique os dígitos</span>
       </div>
-      <div class="field">
+      <div class="field" id="pfl-senha">
         <label>Senha</label>
-        <input type="password" placeholder="••••••••" />
+        <input type="password" placeholder="••••••••" oninput="ce('pfl-senha')" />
+        <span class="err-msg">Informe sua senha</span>
       </div>
-      <span class="forgot" onclick="toast('Link de recuperação enviado!','ok')">Esqueci minha senha</span>
-      <button class="btn-primary" onclick="toast('Login realizado com sucesso! ✓','ok')">Entrar</button>
+      <span class="forgot" onclick="toast('Link de recuperação enviado!','info')">Esqueci minha senha</span>
+      <button class="btn-primary" onclick="loginPF()">Entrar</button>
       <div class="helper">Não tem conta? <a onclick="switchSection('cadastro')">Cadastre-se</a></div>
     </div>
-
-    <!-- ════════════════════ PF CADASTRO ════════════════════ -->
+    <!-- PF CADASTRO -->
     <div class="panel" id="panel-pf-cadastro">
       <div style="margin-bottom:18px"><span class="type-chip chip-pf">PF — Novo Cadastro</span></div>
       <div class="row2">
-        <div class="field">
+        <div class="field" id="pfc-nome">
           <label>Nome</label>
-          <input type="text" placeholder="João" />
+          <input type="text" placeholder="João" oninput="ce('pfc-nome')" />
+          <span class="err-msg">Mínimo 2 letras, sem números</span>
         </div>
-        <div class="field">
+        <div class="field" id="pfc-sobre">
           <label>Sobrenome</label>
-          <input type="text" placeholder="Silva" />
+          <input type="text" placeholder="Silva" oninput="ce('pfc-sobre')" />
+          <span class="err-msg">Mínimo 2 letras, sem números</span>
         </div>
       </div>
-      <div class="field">
+      <div class="field" id="pfc-cpf">
         <label>CPF</label>
-        <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf')" />
+        <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf');ce('pfc-cpf')" />
+        <span class="err-msg">CPF inválido — verifique os dígitos</span>
       </div>
-      <div class="field">
+      <div class="field" id="pfc-nasc">
         <label>Data de Nascimento</label>
-        <input type="date" />
+        <input type="date" id="pfc-nasc-input" onchange="validarNasc('pfc-nasc','pfc-nasc-input')" />
+        <span class="err-msg" id="pfc-nasc-errmsg">Informe a data de nascimento</span>
       </div>
-      <div class="field">
+      <div class="field" id="pfc-tel">
         <label>Telefone</label>
-        <input type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="mask(this,'tel')" />
+        <input type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="mask(this,'tel');ce('pfc-tel')" />
+        <span class="err-msg">Telefone inválido — informe DDD + número</span>
       </div>
-      <div class="field">
+      <div class="field" id="pfc-email">
         <label>E-mail</label>
-        <input type="email" placeholder="joao@email.com" />
+        <input type="email" placeholder="joao@email.com" oninput="ce('pfc-email')" />
+        <span class="err-msg">Informe um e-mail válido</span>
       </div>
       <div class="row2">
-        <div class="field">
+        <div class="field" id="pfc-senha">
           <label>Senha</label>
-          <input type="password" placeholder="••••••••" />
+          <div class="pwd-wrapper">
+            <input type="password" id="pfc-senha-input" placeholder="••••••••" oninput="ce('pfc-senha');checkStrength(this,'pfc-strength')" />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('pfc-senha-input',this)">👁</button>
+          </div>
+          <div class="pwd-strength" id="pfc-strength">
+            <div class="strength-bars"><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div></div>
+            <span class="strength-label"></span>
+          </div>
+          <span class="err-msg">Crie uma senha</span>
         </div>
-        <div class="field">
-          <label>Confirmar</label>
-          <input type="password" placeholder="••••••••" />
+        <div class="field" id="pfc-conf">
+          <label>Confirmar senha</label>
+          <div class="pwd-wrapper">
+            <input type="password" id="pfc-conf-input" placeholder="••••••••" oninput="ce('pfc-conf')" />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('pfc-conf-input',this)">👁</button>
+          </div>
+          <span class="err-msg">As senhas não coincidem</span>
         </div>
       </div>
-      <button class="btn-primary" onclick="toast('Cadastro PF realizado! ✓','ok')">Criar Conta</button>
+      <button class="btn-primary" onclick="cadPF()">Criar Conta</button>
       <div class="helper">Já tem conta? <a onclick="switchSection('login')">Faça login</a></div>
     </div>
-
-    <!-- ════════════════════ PJ LOGIN ════════════════════ -->
+    <!-- PJ LOGIN -->
     <div class="panel" id="panel-pj-login">
       <div style="margin-bottom:18px"><span class="type-chip chip-pj">PJ</span></div>
-      <div class="field">
+      <div class="field" id="pjl-cnpj">
         <label>CNPJ</label>
-        <input type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="mask(this,'cnpj')" />
+        <input type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="mask(this,'cnpj');ce('pjl-cnpj')" />
+        <span class="err-msg">CNPJ inválido — verifique os dígitos</span>
       </div>
-      <div class="field">
+      <div class="field" id="pjl-email">
         <label>E-mail corporativo</label>
-        <input type="email" placeholder="contato@empresa.com.br" />
+        <input type="email" placeholder="contato@empresa.com.br" oninput="ce('pjl-email')" />
+        <span class="err-msg">Informe o e-mail corporativo</span>
       </div>
-      <div class="field">
+      <div class="field" id="pjl-senha">
         <label>Senha</label>
-        <input type="password" placeholder="••••••••" />
+        <input type="password" placeholder="••••••••" oninput="ce('pjl-senha')" />
+        <span class="err-msg">Informe a senha</span>
       </div>
-      <span class="forgot" onclick="toast('Link de recuperação enviado!','ok')">Esqueci minha senha</span>
-      <button class="btn-primary" onclick="toast('Login PJ realizado com sucesso! ✓','ok')">Entrar</button>
+      <span class="forgot" onclick="toast('Link de recuperação enviado!','info')">Esqueci minha senha</span>
+      <button class="btn-primary" onclick="loginPJ()">Entrar</button>
       <div class="helper">Não tem conta? <a onclick="switchSection('cadastro')">Cadastre sua empresa</a></div>
     </div>
-
-    <!-- ════════════════════ PJ CADASTRO ════════════════════ -->
+    <!-- PJ CADASTRO -->
     <div class="panel" id="panel-pj-cadastro">
       <div style="margin-bottom:18px"><span class="type-chip chip-pj">PJ — Nova Empresa</span></div>
-      <div class="field">
+      <div class="field" id="pjc-razao">
         <label>Razão Social</label>
-        <input type="text" placeholder="Empresa Exemplo S.A." />
+        <input type="text" placeholder="Empresa Exemplo S.A." oninput="ce('pjc-razao')" />
+        <span class="err-msg">Informe a razão social</span>
       </div>
       <div class="field">
-        <label>Nome Fantasia</label>
-        <input type="text" placeholder="Nome Fantasia (opcional)" />
+        <label>Nome Fantasia <span style="color:var(--faint);font-size:10px;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input type="text" placeholder="Nome Fantasia" />
       </div>
-      <div class="field">
+      <div class="field" id="pjc-cnpj">
         <label>CNPJ</label>
-        <input type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="mask(this,'cnpj')" />
+        <input type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="mask(this,'cnpj');ce('pjc-cnpj')" />
+        <span class="err-msg">CNPJ inválido — verifique os dígitos</span>
       </div>
       <div class="row2">
         <div class="field">
-          <label>Inscrição Estadual</label>
+          <label>Insc. Estadual <span style="color:var(--faint);font-size:10px;text-transform:none;letter-spacing:0">(opcional)</span></label>
           <input type="text" placeholder="Opcional" />
         </div>
-        <div class="field">
+        <div class="field" id="pjc-porte">
           <label>Porte</label>
-          <select>
+          <select onchange="ce('pjc-porte')">
             <option value="">Selecione</option>
-            <option>MEI</option>
-            <option>ME</option>
-            <option>EPP</option>
-            <option>Médio</option>
-            <option>Grande</option>
+            <option>MEI</option><option>ME</option><option>EPP</option><option>Médio</option><option>Grande</option>
           </select>
+          <span class="err-msg">Selecione o porte</span>
         </div>
       </div>
       <div class="divider">Responsável Legal</div>
       <div class="row2">
-        <div class="field">
+        <div class="field" id="pjc-rnome">
           <label>Nome</label>
-          <input type="text" placeholder="Nome" />
+          <input type="text" placeholder="Nome" oninput="ce('pjc-rnome')" />
+          <span class="err-msg">Mínimo 2 letras, sem números</span>
         </div>
-        <div class="field">
+        <div class="field" id="pjc-rcpf">
           <label>CPF</label>
-          <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf')" />
+          <input type="text" placeholder="000.000.000-00" maxlength="14" oninput="mask(this,'cpf');ce('pjc-rcpf')" />
+          <span class="err-msg">CPF inválido — verifique os dígitos</span>
         </div>
       </div>
-      <div class="field">
+      <div class="field" id="pjc-email">
         <label>E-mail corporativo</label>
-        <input type="email" placeholder="contato@empresa.com.br" />
+        <input type="email" placeholder="contato@empresa.com.br" oninput="ce('pjc-email')" />
+        <span class="err-msg">Informe um e-mail válido</span>
       </div>
-      <div class="field">
+      <div class="field" id="pjc-tel">
         <label>Telefone</label>
-        <input type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="mask(this,'tel')" />
+        <input type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="mask(this,'tel');ce('pjc-tel')" />
+        <span class="err-msg">Telefone inválido — informe DDD + número</span>
       </div>
       <div class="row2">
-        <div class="field">
+        <div class="field" id="pjc-senha">
           <label>Senha</label>
-          <input type="password" placeholder="••••••••" />
+          <div class="pwd-wrapper">
+            <input type="password" id="pjc-senha-input" placeholder="••••••••" oninput="ce('pjc-senha');checkStrength(this,'pjc-strength')" />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('pjc-senha-input',this)">👁</button>
+          </div>
+          <div class="pwd-strength" id="pjc-strength">
+            <div class="strength-bars"><div class="strength-bar"></div><div class="strength-bar"></div><div class="strength-bar"></div></div>
+            <span class="strength-label"></span>
+          </div>
+          <span class="err-msg">Crie uma senha</span>
         </div>
-        <div class="field">
-          <label>Confirmar</label>
-          <input type="password" placeholder="••••••••" />
+        <div class="field" id="pjc-conf">
+          <label>Confirmar senha</label>
+          <div class="pwd-wrapper">
+            <input type="password" id="pjc-conf-input" placeholder="••••••••" oninput="ce('pjc-conf')" />
+            <button type="button" class="pwd-toggle" onclick="togglePwd('pjc-conf-input',this)">👁</button>
+          </div>
+          <span class="err-msg">As senhas não coincidem</span>
         </div>
       </div>
-      <button class="btn-primary" onclick="toast('Empresa cadastrada com sucesso! ✓','ok')">Cadastrar Empresa</button>
+      <button class="btn-primary" onclick="cadPJ()">Cadastrar Empresa</button>
       <div class="helper">Já tem conta? <a onclick="switchSection('login')">Faça login</a></div>
     </div>
-
-  </div><!-- /.main-card -->
-</div><!-- /.wrapper -->
-
-<!-- TOAST -->
+  </div>
+</div>
 <div class="toast" id="toast"></div>
-
 <script>
-  let currentType = 'pf';
-  let currentSection = 'login';
+let currentType='pf',currentSection='login';
 
-  function switchType(type) {
-    currentType = type;
-    document.getElementById('tab-pf').classList.toggle('active', type==='pf');
-    document.getElementById('tab-pj').classList.toggle('active', type==='pj');
-    showPanel();
-  }
-
-  function switchSection(sec) {
-    currentSection = sec;
-    document.getElementById('sec-login').classList.toggle('active', sec==='login');
-    document.getElementById('sec-cad').classList.toggle('active', sec==='cadastro');
-    showPanel();
-  }
-
-  function showPanel() {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    const id = `panel-${currentType}-${currentSection}`;
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-  }
-
-  function openAdmin()  { document.getElementById('admin-modal').classList.add('open'); }
-  function closeAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
-
-  function handleAdmin() {
-    const e = document.getElementById('admin-email').value;
-    const p = document.getElementById('admin-pass').value;
-    if (!e || !p) { toast('Preencha todos os campos','err'); return; }
-    closeAdmin();
-    toast('Acesso admin autorizado ✓','ok');
-  }
-
-  // Fechar modal ao clicar fora
-  document.getElementById('admin-modal').addEventListener('click', function(ev){
-    if (ev.target === this) closeAdmin();
-  });
-
-  // ── MASKS ──
-  function mask(input, type) {
-    let v = input.value.replace(/\D/g,'');
-    if (type==='cpf') {
-      v = v.slice(0,11);
-      v = v.replace(/(\d{3})(\d)/,'$1.$2')
-           .replace(/(\d{3})(\d)/,'$1.$2')
-           .replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-    } else if (type==='cnpj') {
-      v = v.slice(0,14);
-      v = v.replace(/(\d{2})(\d)/,'$1.$2')
-           .replace(/(\d{3})(\d)/,'$1.$2')
-           .replace(/(\d{3})(\d)/,'$1/$2')
-           .replace(/(\d{4})(\d{1,2})$/,'$1-$2');
-    } else if (type==='tel') {
-      v = v.slice(0,11);
-      v = v.length<=10
-        ? v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3')
-        : v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
-    }
-    input.value = v;
-  }
-
-  // ── TOAST ──
-  let toastTimer;
-  function toast(msg, type='') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'toast ' + type;
-    clearTimeout(toastTimer);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => el.classList.add('show'));
-    });
-    toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
-  }
+// Banco de usuários da sessão
+const db = { pf: [], pj: [] };
+function switchType(t){currentType=t;document.getElementById('tab-pf').classList.toggle('active',t==='pf');document.getElementById('tab-pj').classList.toggle('active',t==='pj');showPanel();}
+function switchSection(s){currentSection=s;document.getElementById('sec-login').classList.toggle('active',s==='login');document.getElementById('sec-cad').classList.toggle('active',s==='cadastro');showPanel();}
+function showPanel(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));const el=document.getElementById(`panel-${currentType}-${currentSection}`);if(el)el.classList.add('active');}
+function openAdmin(){document.getElementById('admin-modal').classList.add('open');}
+function closeAdmin(){document.getElementById('admin-modal').classList.remove('open');ce('fa-email');ce('fa-pass');}
+document.getElementById('admin-modal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeAdmin();});
+function handleAdmin(){const email=document.getElementById('admin-email').value.trim();const pass=document.getElementById('admin-pass').value;let ok=true;if(!email){se('fa-email');ok=false;}if(!pass){se('fa-pass');ok=false;}if(!ok){shake('admin-card');return;}if(email!=='pedro@gmail.com'||pass!=='123123'){if(email!=='pedro@gmail.com')se('fa-email');if(pass!=='123123')se('fa-pass');shake('admin-card');toast('Credenciais inválidas!','err');return;}closeAdmin();toast('Acesso admin autorizado ✓','ok');}
+function loginPF(){const cpf=qi('pfl-cpf','input').value.trim();const senha=qi('pfl-senha','input').value;let ok=true;if(!validCPF(cpf)){se('pfl-cpf');ok=false;}if(!senha){se('pfl-senha');ok=false;}if(!ok){shake('panel-pf-login');return;}const user=db.pf.find(u=>u.cpf===cpf.replace(/\D/g,''));if(!user){se('pfl-cpf');qs('#pfl-cpf .err-msg').textContent='CPF não cadastrado';shake('panel-pf-login');return;}if(user.senha!==senha){se('pfl-senha');qs('#pfl-senha .err-msg').textContent='Senha incorreta';shake('panel-pf-login');return;}toast(`Bem-vindo(a), ${user.nome}! ✓`,'ok');}
+function loginPJ(){const cnpj=qi('pjl-cnpj','input').value.trim();const email=qi('pjl-email','input').value.trim();const senha=qi('pjl-senha','input').value;let ok=true;if(!validCNPJ(cnpj)){se('pjl-cnpj');ok=false;}if(!email||!isEmail(email)){se('pjl-email');ok=false;}if(!senha){se('pjl-senha');ok=false;}if(!ok){shake('panel-pj-login');return;}const user=db.pj.find(u=>u.cnpj===cnpj.replace(/\D/g,'')&&u.email===email);if(!user){if(!db.pj.find(u=>u.cnpj===cnpj.replace(/\D/g,''))){se('pjl-cnpj');qs('#pjl-cnpj .err-msg').textContent='CNPJ não cadastrado';}else{se('pjl-email');qs('#pjl-email .err-msg').textContent='E-mail não corresponde ao CNPJ';}shake('panel-pj-login');return;}if(user.senha!==senha){se('pjl-senha');qs('#pjl-senha .err-msg').textContent='Senha incorreta';shake('panel-pj-login');return;}toast(`Bem-vindo(a), ${user.razao}! ✓`,'ok');}
+function cadPF(){const nascValido=validarNasc('pfc-nasc','pfc-nasc-input');const checks=[['pfc-nome',()=>validNome(qi('pfc-nome','input').value)],['pfc-sobre',()=>validNome(qi('pfc-sobre','input').value)],['pfc-cpf',()=>validCPF(qi('pfc-cpf','input').value)],['pfc-tel',()=>validTel(qi('pfc-tel','input').value)],['pfc-email',()=>isEmail(qi('pfc-email','input').value.trim())],['pfc-senha',()=>document.getElementById('pfc-senha-input').value.length>0]];let ok=validate(checks);if(!nascValido)ok=false;const s1=document.getElementById('pfc-senha-input').value;const s2=document.getElementById('pfc-conf-input').value;if(!s2||s2!==s1){se('pfc-conf');qs('#pfc-conf .err-msg').textContent=!s2?'Confirme a senha':'As senhas não coincidem';ok=false;}if(!ok){shake('panel-pf-cadastro');return;}const cpfNum=qi('pfc-cpf','input').value.replace(/\D/g,'');if(db.pf.find(u=>u.cpf===cpfNum)){se('pfc-cpf');qs('#pfc-cpf .err-msg').textContent='CPF já cadastrado';shake('panel-pf-cadastro');return;}db.pf.push({cpf:cpfNum,nome:qi('pfc-nome','input').value.trim()+' '+qi('pfc-sobre','input').value.trim(),senha:s1});toast('Cadastro realizado com sucesso! ✓','ok');setTimeout(()=>switchSection('login'),1800);}
+function cadPJ(){const checks=[['pjc-razao',()=>qi('pjc-razao','input').value.trim().length>0],['pjc-cnpj',()=>validCNPJ(qi('pjc-cnpj','input').value)],['pjc-porte',()=>qi('pjc-porte','select').value!==''],['pjc-rnome',()=>validNome(qi('pjc-rnome','input').value)],['pjc-rcpf',()=>validCPF(qi('pjc-rcpf','input').value)],['pjc-email',()=>isEmail(qi('pjc-email','input').value.trim())],['pjc-tel',()=>validTel(qi('pjc-tel','input').value)],['pjc-senha',()=>document.getElementById('pjc-senha-input').value.length>0]];let ok=validate(checks);const s1=document.getElementById('pjc-senha-input').value;const s2=document.getElementById('pjc-conf-input').value;if(!s2||s2!==s1){se('pjc-conf');qs('#pjc-conf .err-msg').textContent=!s2?'Confirme a senha':'As senhas não coincidem';ok=false;}if(!ok){shake('panel-pj-cadastro');return;}const cnpjNum=qi('pjc-cnpj','input').value.replace(/\D/g,'');if(db.pj.find(u=>u.cnpj===cnpjNum)){se('pjc-cnpj');qs('#pjc-cnpj .err-msg').textContent='CNPJ já cadastrado';shake('panel-pj-cadastro');return;}db.pj.push({cnpj:cnpjNum,email:qi('pjc-email','input').value.trim(),razao:qi('pjc-razao','input').value.trim(),senha:s1});toast('Empresa cadastrada com sucesso! ✓','ok');setTimeout(()=>switchSection('login'),1800);}
+function validate(checks){let ok=true;for(const[id,fn]of checks){if(!fn()){se(id);ok=false;}}return ok;}
+function se(id){document.getElementById(id).classList.add('err');}
+function ce(id){document.getElementById(id).classList.remove('err');}
+function qi(id,sel){return document.querySelector(`#${id} ${sel}`);}
+function qs(sel){return document.querySelector(sel);}
+function isEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+function validCPF(cpf){const n=cpf.replace(/\D/g,'');if(n.length!==11)return false;if(/^(\d)\1{10}$/.test(n))return false;let sum=0;for(let i=0;i<9;i++)sum+=parseInt(n[i])*(10-i);let r=(sum*10)%11;if(r===10||r===11)r=0;if(r!==parseInt(n[9]))return false;sum=0;for(let i=0;i<10;i++)sum+=parseInt(n[i])*(11-i);r=(sum*10)%11;if(r===10||r===11)r=0;return r===parseInt(n[10]);}
+function validCNPJ(cnpj){const n=cnpj.replace(/\D/g,'');if(n.length!==14)return false;if(/^(\d)\1{13}$/.test(n))return false;const calc=(len)=>{let sum=0,pos=len-7;for(let i=len;i>=1;i--){sum+=parseInt(n[len-i])*pos--;if(pos<2)pos=9;}const r=sum%11;return r<2?0:11-r;};return calc(12)===parseInt(n[12])&&calc(13)===parseInt(n[13]);}
+function validNome(val){const s=val.trim();if(s.length<2)return false;if(/\d/.test(s))return false;if(/[!@#$%^&*()_+=\[\]{};':"\\|,.<>\/?`~\-]/.test(s))return false;return true;}
+const DDD_VALIDOS=[11,12,13,14,15,16,17,18,19,21,22,24,27,28,31,32,33,34,35,37,38,41,42,43,44,45,46,47,48,49,51,53,54,55,61,62,63,64,65,66,67,68,69,71,73,74,75,77,79,81,82,83,84,85,86,87,88,89,91,92,93,94,95,96,97,98,99];
+function validTel(val){const n=val.replace(/\D/g,'');if(n.length<10||n.length>11)return false;const ddd=parseInt(n.substring(0,2));if(!DDD_VALIDOS.includes(ddd))return false;const num=n.substring(2);if(num.length===9&&num[0]!=='9')return false;return true;}
+function validarNasc(fieldId,inputId){const input=document.getElementById(inputId);const errMsg=document.getElementById(fieldId+'-errmsg');const val=input?input.value:'';if(!val){if(errMsg)errMsg.textContent='Informe a data de nascimento';se(fieldId);return false;}const nasc=new Date(val+'T00:00:00');const hoje=new Date();hoje.setHours(0,0,0,0);if(nasc>hoje){if(errMsg)errMsg.textContent='Data não pode ser no futuro';se(fieldId);return false;}let idade=hoje.getFullYear()-nasc.getFullYear();const m=hoje.getMonth()-nasc.getMonth();if(m<0||(m===0&&hoje.getDate()<nasc.getDate()))idade--;if(idade<16){if(errMsg)errMsg.textContent='É necessário ter pelo menos 16 anos';se(fieldId);return false;}if(idade>120){if(errMsg)errMsg.textContent='Data de nascimento inválida';se(fieldId);return false;}ce(fieldId);return true;}
+function checkStrength(input,strengthId){const pwd=input.value;const el=document.getElementById(strengthId);if(!el)return;if(!pwd){el.classList.remove('visible','fraco','medio','forte');return;}el.classList.add('visible');let score=0;if(pwd.length>=8)score++;if(pwd.length>=12)score++;if(/[A-Z]/.test(pwd)&&/[a-z]/.test(pwd))score++;if(/\d/.test(pwd))score++;if(/[^A-Za-z0-9]/.test(pwd))score++;el.classList.remove('fraco','medio','forte');const label=el.querySelector('.strength-label');if(pwd.length<8||score<=2){el.classList.add('fraco');if(label)label.textContent='🔴 Fraco';}else if(score<=3){el.classList.add('medio');if(label)label.textContent='🟡 Médio';}else{el.classList.add('forte');if(label)label.textContent='🟢 Forte';}}
+function togglePwd(inputId,btn){const inp=document.getElementById(inputId);if(!inp)return;const show=inp.type==='password';inp.type=show?'text':'password';btn.textContent=show?'🙈':'👁';}
+function shake(id){const el=document.getElementById(id);el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');el.addEventListener('animationend',()=>el.classList.remove('shake'),{once:true});}
+function mask(input,type){let v=input.value.replace(/\D/g,'');if(type==='cpf'){v=v.slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');}else if(type==='cnpj'){v=v.slice(0,14).replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2');}else if(type==='tel'){v=v.slice(0,11);v=v.length<=10?v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3'):v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');}input.value=v;}
+let tt;
+function toast(msg,type='info'){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+type;clearTimeout(tt);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));tt=setTimeout(()=>el.classList.remove('show'),3500);}
 </script>
 </body>
 </html>
